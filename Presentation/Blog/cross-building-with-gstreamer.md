@@ -1,7 +1,7 @@
-##My Cross Compiling Journey With gst-build and GStreamer
+## My Cross Compiling Journey With gst-build and GStreamer
 
 
-###The State of the Art:
+### The State of the Art:
 
 GStreamer relies on multiple repositories such as base and good to build its ecosystem, and now owns more than 30 projects in Gitlab. So, a unified tool/build system has always been necessary to build a specified version.
 
@@ -10,13 +10,13 @@ For more than 10 years, a script named `gst-uninstalled` was present in the `gst
 Another build system named [cerbero](https://gitlab.freedesktop.org/gstreamer/cerbero), implemented a few years ago, provides a standalone solution to building GStreamer packages. This solution offers a wide range of options in addition to a proper sandbox to avoid system dependencies and to be able to prepare packages according to proper third party software dependencies for a given version. `cerbero` is written in Python and can build for the host machine like `gst-uninstalled` but also for various common targets depending on the host. Indeed a Linux regular desktop host will offer to cross-build GStreamer for x86(32/64bits) but also for archictecture such *ARM* and system such as *Microsoft Windows*. Despite a shell environment allowing artifact testing, `cerbero` is not really convenient for a day to day development related to GStreamer as a new plugin development or a bug fix as it is not easy to update to the last revision without loosing a current work, or to test another branch of GStreamer
 
 
-###The Rise of gst-build:
+### The Rise of gst-build:
 
 In order to improve this situation,  [gst-build](https://gitlab.freedesktop.org/gstreamer/gst-build) was born .
 Taking advantage of the flexibility of the rising build system, [meson](https://mesonbuild.com/), `gst-build` has been implemented to replace `gst-uninstalled` and provide a quick and smooth environment to hack into GStreamer and its dependencies.
 
 
-###Autotools Is Dead, Long Live Meson:
+### Autotools Is Dead, Long Live Meson:
 
 Since GStreamer 1.18, `meson` has been chosen as the only build system for the official GStreamer repositories. For its simplicity, speed and flexibility, `meson` replaces `autotools`, so it is also perfect for use with `gst-build`. Indeed `gst-build` is first and foremost a `meson` project including `GStreamer` sub-projects with options to enable/disable selected sub-projects.
 
@@ -25,18 +25,18 @@ So lets take a look on how to get started with `gst-build`:
 
 ### A first step using gst-build:
 
-####Preliminaries
+#### Preliminaries
 
 `gst-build` is mainly a `meson.build` project. It reads .wrap files which are located in the `subprojects` folder to determine the elements of the project such as GStreamer or Glib. These subprojects use the `meson` build system. `gst-build` comes with the essential projects you need to start using GStreamer and build it almost without system dependencies. BY the way, GStreamer framework does not need system dependencies as gst-build bundles `libffi` or `glib`. but can also gather the dependencies using `pkg-config` from the system to build the GStreamer plugins such as flac, for example, which needs libflac to build.
 
-####Environment
+#### Environment
 
 As we have to choose a real development environment, a 64 bit machine has been selected:
 
  * Ubuntu 18.04
  * Bash Shell
 
-####Prerequisites
+#### Prerequisites
 
  * build-essential (gcc)
  * python3
@@ -44,7 +44,7 @@ As we have to choose a real development environment, a 64 bit machine has been s
  * meson
  * ninja
 
-####Install meson and ninja
+#### Install meson and ninja
 
 Here are the essential dependencies you need to install before running meson and ninja.
 
@@ -61,7 +61,7 @@ You can now install meson from the pip repository.
 This will install `meson` into `~/.local/bin` which may or may not be included automatically in your PATH by default.
 
 
-####Fetch & configure
+#### Fetch and Configure
 
 This step will download the GStreamer repositories including some dependencies such as glib etc into the `subprojects` folder. Basically
 it tries to download as many "mesonified" third party libraries as possible,  and `breaking news` the cmake ones, as a bridge
@@ -127,7 +127,7 @@ dependencies have been met or built by gst-build (ie glib, openh264 etc.).
 ```
 
 
-####Test gst-build
+#### Test gst-build
 
 This command will create a new environment where all tools and plugins built previously are available in the env super-setting the system one with the right environment variables.
 
@@ -154,13 +154,13 @@ From this shell, you are also able to compile without exiting the environment. T
 [gst-master] bash-prompt # gst-inspect-1.0
 ```
 
-###Let's speak about cross-compilation:
+### Let's Talk about Cross-Compilation:
 
 As `gst-build` is the perfect partner to get started with a GStreamer development, here is my experience to perform a cross-build, which can be very useful when you want to save precious build time or be able to work on both host and target with the same base code.
 
 In this post, I will target an **aarch64** cpu for the Xilinx reference design: **Zynq UltraScale+ MPSoC rev F**
 
-####Prerequisites
+#### Prerequisites
 
 * Toolchain (aarch64-linux-gnu-gcc) + sysroot (optional)
 * Meson cross file
@@ -174,7 +174,7 @@ First we'll need here to have a proper toolchain to cross-build. In my case I us
 
 This is installing a minimal toolchain in `/usr/aarch64-linux-gnu/`
 
-####Cross file generated with generate-cross-file.py
+#### Cross file generated with generate-cross-file.py
 
 Here is the cross file used to build for `aarch64`, this file has been generated with this [helper script](https://gitlab.freedesktop.org/dabrain34/gst-build/blob/dab_add_cross_file_generation/generate-cross-file.py) allowing to generated the cross file for other target as well.
 As you can see, here, we don't use a dedicated rootfs because gst-build will build all that we need for the GStreamer essentials.
@@ -217,7 +217,7 @@ Indeed since `meson` > 0.54, you can define `pkg_config_libdir` which will help 
 Predefined cross file can also be found in `gst-build/data/cross-files`
 
 
-####Configuring the project for Zynq UltraScale+ MPSoC rev F
+#### Configuring the project for Zynq UltraScale+ MPSoC rev F
 
 When the cross file is ready, we can now configure `gst-build` in order to have a dedicated build for our platform. Here I am disabling some unnecessary options of gst-build such as libav, vaapi or gtk_doc
 
@@ -234,7 +234,7 @@ After this step, you should be able to build with `ninja`.
 # ninja -C build-cross-arm64
 ```
 
-####Installing
+#### Installing
 
 Last but not the least, you need to install the artifacts in a given folder to be mounted by your target with NFS by example. You have to provide a **DESTDIR** variable to `ninja` and it will install in `$DESTDIR/usr/local/` as install prefix.
 
@@ -256,7 +256,7 @@ After mounting the folder or copying it to your target, you have to set up a few
 A python script is also available [here](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/cross-gst-uninstalled.py) to set up the correct environment.
 
 
-####Building a dependency such as kmssink
+#### Building a dependency such as kmssink
 
 In order to build a dependency such as `kmssink` which depends on `libdrm`. You'll need to get a proper sysroot with all the libraries which kms depends on.
 
