@@ -25,7 +25,7 @@ So lets take a look on how to get started with `gst-build`:
 
 ### A first step using gst-build:
 
-####A few 'bits' about it:
+#### A few 'bits' about it:
 
 `gst-build` is mainly a `meson.build` project. It reads .wrap files which are located in the `subprojects` folder to determine the elements of the project such as GStreamer or gst-plugins-base. These subprojects use the `meson` build system as well. `gst-build` comes with the essential projects you need to start using GStreamer and build it almost without system dependencies. `gst-build` bundles `libffi` or `glib` in the subprojects directory. It can also gather dependencies using `pkg-config` from the system to build the GStreamer plugins such as flac, for example, which needs libflac to build.
 
