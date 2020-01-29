@@ -3,27 +3,27 @@
 ### A brief Introduction
 
 gst-build is one of the two build system used by the community to hack into the whole GStreamer solution.
-A previous blogpost here has been released to present gst-build and how to hack into it.
+A previous blogpost [here](https://www.collabora.com/FIXME) has been released to present gst-build and how to hack into it.
 
 So I will go straight to the point regarding the cross compilation with it.
 
 Here is my experience to perform a cross-build which can be very useful when you want to save precious build time or be able to work on both host and target with the same base code.
 
-In this post, I will target an **aarch64** CPU for the [Xilinx)(https://www.xilinx.com/) reference design: **Zynq UltraScale+ MPSoC rev F**
+In this post, I will target an **aarch64** CPU for the [Xilinx](https://www.xilinx.com/) reference board: **Zynq UltraScale+ MPSoC ZCU106 Evaluation Kit**
 
 #### Prerequisites
 
-* Tool-chain (aarch64-linux-gnu-gcc) + sysroot (optional)
+* Toolchain (aarch64-linux-gnu-gcc) + sysroot (optional)
 * Meson cross file
-* Meson > 0.54 (which is not available on blog creation date but [patch merged](https://github.com/mesonbuild/meson/pull/6461) in the official repository)
+* Meson > 0.54 (which is not available at the time of writing this blog post but the [merged bugfix patch](https://github.com/mesonbuild/meson/pull/6461) in the official repository)
 
-First we'll need here to have a proper tool-chain to cross-build. In my case I used the regular tool-chain provided by Ubuntu installing the packages:
+First we'll need here to have a proper toolchain to cross-build. In my case I used the regular toolchain provided by Ubuntu installing the packages:
 
 ```
 # sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross
 ```
 
-This is installing a minimal tool-chain in `/usr/aarch64-linux-gnu/`
+This is installing a minimal toolchain in `/usr/aarch64-linux-gnu/`
 
 #### Cross file generated with generate-cross-file.py
 
@@ -68,11 +68,11 @@ Indeed since `meson` > 0.54, you can define `pkg_config_libdir` which will help 
 Predefined cross file can also be found in `gst-build/data/cross-files`
 
 
-#### Configuring the project for Zynq UltraScale+ MPSoC rev F
+#### Configuring the project for Zynq UltraScale+ MPSoC ZCU106 Evaluation Board
 
-When the cross file is ready, we can now configure `gst-build` in order to have a dedicated build for our platform. Here I'm disabling some unnecessary options of `gst-build` such as *libav*, *vaapi* or *gtk_doc*.
+When the cross file ready, we can now configure `gst-build` in order to have a dedicated build for our platform. Here I'm disabling some unnecessary options of `gst-build` such as *libav*, *vaapi* or *gtk_doc*.
 
-Please ensure that you have the last meson version, otherwise gst-build will take glib from the system.
+Please ensure that you have the last meson version, otherwise gst-build will take glib from the system. Notice that on this platform, we use gst-omx, so we also give some options specific to this platform, in particular the path to the OpenMAX headers from Xilinx.
 
 ```
 # /path/to/meson_0_54 build-cross-arm64 --cross-file=my-meson-cross-file.txt -D omx=enabled -D sharp=disabled -D gst-omx:header_path=/opt/allegro-vcu-omx-il/omx_header -D gst-omx:target=zynqultrascaleplus -D libav=disabled -D rtsp_server=disabled -D vaapi=disabled -D disable_gst_omx=false -Dugly=disabled -Dgtk_doc=disabled -Dglib:libmount=false
@@ -87,7 +87,7 @@ After this step, you should be able to build with `ninja`.
 
 #### Installing
 
-Last but not the least, you need to install the artifacts in a given folder to be mounted by your target with NFS by example. You have to provide a **DESTDIR** variable to `ninja` and it will install in `$DESTDIR/usr/local/` as install prefix.
+Last but not the least, you need to install the artifacts in a folder to deploy on the device, for example, by mounting it your target with NFS. You have to provide a **DESTDIR** variable to `ninja` and it will install in `$DESTDIR/usr/local/` as install prefix.
 
 ```
 # DESTDIR=/opt/gst-build-cross-artifacts ninja -C build-cross-arm64 install
@@ -104,14 +104,14 @@ After mounting the folder or copying it to your target, you have to set up a few
  * GST_PLUGIN_PATH=$DESTDIR/usr/local/lib/gstreamer-1.0
  * GST_OMX_CONFIG_DIR=$DESTDIR/usr/local/etc/xdg
 
-A python script is also available [here](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/cross-gst-uninstalled.py) to setup the correct environment for your environment.
+A python script is also available [here](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/cross-gst-uninstalled.py) to setup the correct environment variables for your target.
 
 
 #### Building a dependency such as kmssink
 
 In order to build a dependency such as `kmssink` which depends on `libdrm`. You'll need to get a proper sysroot with all the libraries, which `kmssink` depends on.
 
-Regarding a root file-system with `libdrm`, I generated one with [cerbero](https://gitlab.freedesktop.org/gstreamer/cerbero) where cross compiling could be described in a next blog post :)
+Regarding a root file-system with `libdrm`, I generated one with [cerbero](https://gitlab.freedesktop.org/gstreamer/cerbero) where cross compiling could be described in a next blog post :) But you should normally have it as part of your sysroot.
 
 By now the `libdrm` recipe in `cerbero` is not available but can be found in this [merge request](https://gitlab.freedesktop.org/gstreamer/cerbero/merge_requests/392)
 
