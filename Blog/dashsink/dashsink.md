@@ -1,7 +1,7 @@
-#Dashsink for a complete offering in GStreamer
+# Dashsink for a complete offering in GStreamer
 
 
-##A brief introduction to adaptive streaming and MPEG DASH
+## A brief introduction to adaptive streaming and MPEG DASH
 
 Adaptive streaming is a technique to provide flexibility and scalability by offering variable bit-rate streams to the client.
 Designed to work over HTTP, it provides media content as separate streams with media type and various bit-rates, the client will be able to select according to its network bandwidth or its CPU power.
