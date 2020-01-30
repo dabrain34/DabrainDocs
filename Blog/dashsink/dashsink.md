@@ -90,4 +90,6 @@ In the following pipeline a static MPD file is created in `/tmp` along with one 
 # gst-launch-1.0 -m dashsink name=dashsink mpd-root-path=/tmp target-duration=60 dynamic=false period-duration=60000 muxer=ts  v4l2src ! video/x-raw,framerate=30/1,width=320,height=240 ! videoconvert ! queue ! x264enc bitrate=400 ! dashsink.video_0
 ```
 
+A further work item is to implement support for creating MP4 fragment files following the CMAF (MPEG-A Part 19) specification.
+
 If you would like to learn more about `dashsink` or any other parts of GStreamer, please [contact us](https://www.collabora.com/contact-us.html)
