@@ -27,7 +27,7 @@ So lets take a look on how to get started with `gst-build`:
 
 #### A few 'bits' about it:
 
-`gst-build` is mainly a `meson.build` project. It reads .wrap files which are located in the `subprojects` folder to determine the elements of the project such as GStreamer or gst-plugins-base. These subprojects use the `meson` build system as well. `gst-build` comes with the essential projects you need to start using GStreamer and build it almost without system dependencies. `gst-build` bundles `libffi` or `glib` in the subprojects directory. It can also gather dependencies using `pkg-config` from the system to build the GStreamer plugins such as flac, for example, which needs libflac to build.
+`gst-build` is mainly a `meson.build` project. It reads .wrap files which are located in the `subprojects` folder to determine the elements of the project such as GStreamer or gst-plugins-base. These subprojects use the `meson` build system as well. `gst-build` comes with the essential projects you need to start using GStreamer and build it almost without system dependencies. `gst-build` bundles `libffi` or `glib` in the `subprojects` directory. It can also gather dependencies using `pkg-config` from the system to build the GStreamer plugins such as `flac`, for example, which needs `libflac` to build.
 
 #### Environment
 
@@ -52,7 +52,7 @@ Here are the essential dependencies you need to install before running meson and
 sudo apt install build-essential python3 git ninja python3-pip
 ```
 
-You can now install meson from the pip repository.
+You can now install `meson` from the `pip` repository.
 
 ```
  pip3 install --user meson
@@ -63,9 +63,7 @@ This will install `meson` into `~/.local/bin` which may or may not be included a
 
 #### Fetch and Configure
 
-This step will download the GStreamer repositories including some dependencies such as glib etc into the `subprojects` folder. Basically
-it tries to download as many "mesonified" third party libraries as possible,  and `breaking news` the cmake ones, as a bridge
-has been implemented recently if necessary.
+This step will download the GStreamer repositories including some dependencies such as glib etc. into the `subprojects` folder. Basically it tries to download as many "mesonified" third party libraries as possible,  and `breaking news` the `cmake` ones, as a bridge has been implemented recently if necessary.
 
 ```
 # git clone https://gitlab.freedesktop.org/gstreamer/gst-build
@@ -119,8 +117,7 @@ After this step, a newly created folder named `build` should be ready to be used
 
 ##### Build gst-build
 
-This step will build all GStreamer libraries in addition to the plugins from base/good/bad/ugly/libav if their
-dependencies have been met or built by `gst-build` (ie glib, openh264 etc.).
+This step will build all GStreamer libraries in addition to the plugins from base/good/bad/ugly/libav if their dependencies have been met or built by `gst-build` (ie glib, openh264 etc.).
 
 ```
 # ninja -C build
@@ -148,7 +145,7 @@ A prefix to your prompt should be shown as
 
 From this environment you are now ready to use the power of GStreamer, and even implement new features in it without the fear of using out of date version.
 
-From this shell, you are also able to compile without exiting the environment. This feature is very convenient to test a branch or fix a bug. Go to the `subprojects` folder and modify the code directly.
+From this shell, you are also able to compile without exiting the environment. This feature is very convenient to test a branch or fix a bug. Go to the `subprojects` folder and modify the code directly and then call `ninja -C ../../build`.
 
 ```
 [gst-master] bash-prompt # gst-inspect-1.0
@@ -156,8 +153,7 @@ From this shell, you are also able to compile without exiting the environment. T
 
 #### Let's add a log line in gst-plugins-base
 
-In this tutorial, I will explain how to add a log line in videotestsrc element, gst-plugins-base's plugin, rebuild using
-gst-build and test that the new log is now displayed.
+In this tutorial, I will explain how to add a log line in `videotestsrc` element, gst-plugins-base's plugin, rebuild using gst-build and test that the new log is now displayed.
 
 ##### Edit the file
 
