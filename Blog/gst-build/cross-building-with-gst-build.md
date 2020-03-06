@@ -2,10 +2,10 @@
 
 ### A brief Introduction
 
-gst-build is one of the two build system used by the community to hack into the whole GStreamer solution.
-A previous [blogpost](https://www.collabora.com/news-and-blog/) has been released to present gst-build and how to hack into it.
+[gst-build](https://gitlab.freedesktop.org/gstreamer/gst-build/) is one of the two build system used by the community to hack into the whole GStreamer solution.
+A previous [blogpost](https://www.collabora.com/news-and-blog/) has been released to present gst-build and how to get started with it.
 
-So I will go straight to the point regarding the cross compilation with it.
+So I will go straight to the point regarding the cross compilation.
 
 Here is my experience to perform a cross-build which can be very useful when you want to save precious build time or be able to work on both host and target with the same base code.
 
@@ -27,8 +27,8 @@ This is installing a minimal toolchain in `/usr/aarch64-linux-gnu/`
 
 #### Cross file generated with generate-cross-file.py
 
-Here is the cross file used to build for `aarch64`, this file has been generated with this [helper script](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/generate-cross-file.py) allowing to generated the cross file for other target as well.
-As you can see, here, we don't use a dedicated rootfs because `gst-build` will build all that we need for the GStreamer essentials (including libffi, glib etc.).
+Below the cross file used to build for `aarch64`, this file has been generated with this [helper script](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/generate-cross-file.py) allowing to generated the cross file for other target as well.
+As you can see, here, we don't use a dedicated *rootfs* because `gst-build` will build all that we need for the GStreamer essentials (including libffi, glib etc.).
 
 ```
 # ./generate-cross-file.py
@@ -71,7 +71,7 @@ Predefined cross file can also be found in `gst-build/data/cross-files`
 
 When the cross file ready, we can now configure `gst-build` in order to have a dedicated build for our platform. Here I'm disabling some unnecessary options of `gst-build` such as *libav*, *vaapi* or *gtk_doc*.
 
-Please ensure that you have the last `meson` version [necessary patch](https://github.com/mesonbuild/meson/pull/6461), otherwise `gst-build` will take glib from the system. Notice that on this platform, we use `gst-omx`, so we also give some options specific to this platform, in particular the path to the OpenMAX headers from Xilinx.
+Please ensure that you have the last `meson` version [necessary patch](https://github.com/mesonbuild/meson/pull/6461), otherwise `gst-build` will take glib from the system (pkg_config_libdir prerequisite). Notice that on this platform, we use `gst-omx`, so we also give some options specific to this platform, in particular the path to the OpenMAX headers from Xilinx.
 
 ```
 # /path/to/meson_0_54 build-cross-arm64 --cross-file=my-meson-cross-file.txt -D omx=enabled -D sharp=disabled -D gst-omx:header_path=/opt/allegro-vcu-omx-il/omx_header -D gst-omx:target=zynqultrascaleplus -D libav=disabled -D rtsp_server=disabled -D vaapi=disabled -D disable_gst_omx=false -Dugly=disabled -Dgtk_doc=disabled -Dglib:libmount=false
@@ -89,9 +89,8 @@ After this step, you should be able to build with `ninja`.
 Last but not the least, you need to install the artifacts in a folder to deploy on the device, for example, by mounting it your target with NFS. You have to provide a **DESTDIR** variable to `ninja` and it will install in `$DESTDIR/usr/local/` as install prefix.
 
 ```
-# DESTDIR=/opt/gst-build-cross-artifacts ninja -C build-cross-arm64 install
+# DESTDIR=/opt/gst-build-cross-artifacts/linux_arm64 ninja -C build-cross-arm64 install
 ```
-
 
 #### Running the binaries on target
 
@@ -105,12 +104,15 @@ After mounting the folder or copying it to your target, you have to set up a few
 
 A [python script](https://github.com/dabrain34/gstreamer-toolkit/blob/master/gst-build-helper/cross-gst-uninstalled.py) is also available to setup the correct environment variables for your target.
 
+```
+# /path_to/cross-gst-uninstalled.py /opt/gst-build-cross-artifacts/linux_arm64
+```
 
 #### Building wavpack in gst-plugins-good
 
-To build a plugin such as `wavpack` which depends on the 3rd party [wavpack library](https://github.com/dbry/WavPack). You'll need to get a proper sysroot with this new library and its dependencies (if needed).
+To build a plugin such as `wavpack` which depends on the 3rd party [wavpack library](https://github.com/dbry/WavPack). You'll need to get a proper *sysroot* with this new library and its dependencies (if needed).
 
-Regarding a root file-system with `wavpack`, I generated one with [cerbero](https://gitlab.freedesktop.org/gstreamer/cerbero) where cross compiling could be described in a next blog post :) But you should normally have it as part of your sysroot.
+Regarding a root file-system with `wavpack`, I generated one with [cerbero](https://gitlab.freedesktop.org/gstreamer/cerbero) where cross compiling could be described in a next blog post :) But you should normally have it as part of your *sysroot*.
 
 ```
 # cd /opt
@@ -160,7 +162,7 @@ strip = ['aarch64-linux-gnu-strip']
 
 Now you should be able to go back to the configure/build/install step and get the `wavpack` in your plugins registry.
 
-I hope you'll enjoy the use of `gst-build`, which is for me a very powerful and adaptable tool.
+I hope you'll enjoy the use of `gst-build`, which is for me a very powerful and flexible tool.
 A lot of options can be found in the `gst-build` [README](https://gitlab.freedesktop.org/gstreamer/gst-build/README.md) such as the `update`
 or the use of GStreamer branches.
 
