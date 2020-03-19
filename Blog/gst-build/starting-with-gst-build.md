@@ -49,13 +49,13 @@ As we have to choose a real development environment, a 64 bit machine has been s
 Here are the essential dependencies you need to install before running meson and ninja.
 
 ```
-sudo apt install build-essential python3 git ninja python3-pip
+$ sudo apt install build-essential python3 git ninja python3-pip
 ```
 
 You can now install meson from the `pip` repository.
 
 ```
- pip3 install --user meson
+$ pip3 install --user meson
 ```
 
 This will install `meson` into `~/.local/bin` which may or may not be included automatically in your PATH by default.
@@ -66,9 +66,9 @@ This will install `meson` into `~/.local/bin` which may or may not be included a
 This step will download the GStreamer repositories including some dependencies such as glib etc. into the `subprojects` folder. Basically it tries to download as many `mesonified` third party libraries as possible,  and breaking news the `cmake` ones, as a bridge has been implemented recently if necessary.
 
 ```
-# git clone https://gitlab.freedesktop.org/gstreamer/gst-build
-# cd gst-build
-# meson build --buildtype=debug
+$ git clone https://gitlab.freedesktop.org/gstreamer/gst-build
+$ cd gst-build
+$ meson build --buildtype=debug
 ```
 
 ```
@@ -122,27 +122,27 @@ As you may notice, `--buildtype=debug` has been added to the command line to get
 This step will build all GStreamer libraries in addition to the plugins from base/good/bad/ugly/libav if their dependencies have been met or built by `gst-build` (ie glib, openh264 etc.).
 
 ```
-# ninja -C build
+$ ninja -C build
 ```
 
 
-#### Test gst-build
+### Test gst-build
 
 This command will create an environment where all tools and plugins built previously are available in the environment as a superset of the system environment with the right environment variables set.
 
 ```
-# ninja -C build devenv
+$ ninja -C build devenv
 ```
 
 A prefix to your prompt should be shown as
 
 
 ```
-[gst-master] bash-prompt #
+[gst-master] bash-prompt $
 ```
 
 ```
-[gst-master] bash-prompt # env | grep GST_
+[gst-master] bash-prompt $ env | grep GST_
 ```
 
 From this environment you are now ready to use the power of GStreamer, and even implement new features in it without the fear of using out of date version.
@@ -150,7 +150,7 @@ From this environment you are now ready to use the power of GStreamer, and even 
 From this shell, you are also able to compile without exiting the environment except when a configure step is necessary. This feature is very convenient to test a branch or fix a bug. Go to the `subprojects` folder and modify the code directly and then call `ninja -C ../../build`.
 
 ```
-[gst-master] bash-prompt # gst-inspect-1.0
+[gst-master] bash-prompt $ gst-inspect-1.0
 ```
 
 #### Let's add a log line in gst-plugins-base
@@ -174,7 +174,7 @@ Then close the editor.
 ##### Build with gst-build
 
 ```
-ninja -C build
+$ ninja -C build
 ```
 
 You should see that only the file `gstvideotestsrc.c` rebuilt.
@@ -210,7 +210,7 @@ Freeing pipeline ..
 
 This command will update all the repositories and will reissue a build.
 ```
-ninja -C build_dir update
+$ ninja -C build_dir update
 ```
 
 #### Adding a new repository
@@ -219,17 +219,17 @@ Better to be outside of `devenv` env.
 If you want to add a new repository and work in this environment. Very simple and handy way, you'll have to:
 
 ```
-# cd subprojects
-# git clone my_subproject
-# cd ../build
-# rm -rf * && meson .. -Dcustom_subprojects=my_subproject
+$ cd subprojects
+$ git clone my_subproject
+$ cd ../build
+$ rm -rf * && meson .. -Dcustom_subprojects=my_subproject
 ```
 
 And then you can go in your `subproject`, edit, change, remove even stare at his beauty.
 
 ```
-# ninja -C ../../build
-# ninja -C ../../build uninstalled
+$ ninja -C ../../build
+$ ninja -C ../../build uninstalled
 ```
 
 
